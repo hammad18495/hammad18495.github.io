@@ -67,6 +67,15 @@
       </div>
       <div class="field"><label for="f-msg">Message *</label><textarea id="f-msg" name="message" required placeholder="Tell me a bit about the role or project…"></textarea><div class="err">Please write a short message</div></div>
       <button class="btn btn-primary" type="submit">Send message <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button>
+      <div id="form-error" class="form-error" hidden role="alert">
+        <b>Sorry, the message couldn't be sent from here right now.</b>
+        <p>Your text is still in the form. You can send it another way:</p>
+        <div class="hero-ctas" style="margin:0;gap:10px">
+          <a class="btn btn-primary btn-sm" id="gmail-link" href="#" target="_blank" rel="noopener">Send with Gmail <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg></a>
+          <a class="btn btn-ghost btn-sm" id="mailto-link" href="#">Use my email app</a>
+          <button class="btn btn-ghost btn-sm" type="button" data-copy="hammad18495@gmail.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Copy email address</button>
+        </div>
+      </div>
       <p class="form-note">Prefer a direct email? Write to <a href="mailto:hammad18495@gmail.com" style="color:var(--brand-2)">hammad18495@gmail.com</a>.</p>
     </form>
     <div id="form-success" hidden style="text-align:center;padding:30px 0">
