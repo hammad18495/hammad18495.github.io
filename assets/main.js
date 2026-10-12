@@ -218,13 +218,17 @@
       });
       const res = await r.json().catch(() => ({}));
       if (!r.ok || String(res.success) === 'false') throw new Error(res.message || 'send failed');
-      form.reset();
+      form.reset(); $('#form-error').hidden = true;
       $('#form-success').hidden = false; form.hidden = true;
       toast('Message sent. Thank you!');
     } catch (err) {
+      // Don't force a desktop mail app: show options inline and keep what they typed
       const body = `${d.message}\n\n— ${d.name}${d.company ? ', ' + d.company : ''}\n${d.email}`;
-      toast('Couldn\'t send directly, opening your email app…');
-      location.href = `mailto:hammad18495@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      const box = $('#form-error');
+      $('#gmail-link', box).href = `https://mail.google.com/mail/?view=cm&fs=1&to=hammad18495@gmail.com&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      $('#mailto-link', box).href = `mailto:hammad18495@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      box.hidden = false;
+      box.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' });
     } finally { btn.disabled = false; btn.innerHTML = label; }
   });
   $('#send-another')?.addEventListener('click', () => { $('#form-success').hidden = true; form.hidden = false; });

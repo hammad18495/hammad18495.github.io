@@ -383,3 +383,4 @@ body.leaving main{opacity:0;transition:opacity .22s}
   .marquee-track{animation:none}
 }
 [hidden]{display:none!important}
+.form-error{margin:18px 0 6px;padding:18px 20px;border-radius:14px;border:1px solid rgba(255,107,129,.45);background:rgba(255,107,129,.08)}.form-error p{color:var(--muted);margin:6px 0 14px;font-size:.92rem}.form-error .btn svg{width:16px;height:16px}
