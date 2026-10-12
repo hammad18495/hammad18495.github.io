@@ -193,9 +193,9 @@
     catch { toast(b.dataset.copy); }
   }));
 
-  /* contact form → opens email client */
+  /* contact form → sent via FormSubmit (free), falls back to email app */
   const form = $('#contact-form');
-  form?.addEventListener('submit', e => {
+  form?.addEventListener('submit', async e => {
     e.preventDefault();
     let ok = true;
     $$('[required]', form).forEach(inp => {
@@ -205,11 +205,29 @@
     });
     if (!ok) { toast('Please fill in the highlighted fields'); return; }
     const d = Object.fromEntries(new FormData(form));
+    if (d._honey) return; // bot
     const subject = `[Portfolio] ${d.topic} — ${d.name}`;
-    const body = `${d.message}\n\n— ${d.name}${d.company ? ', ' + d.company : ''}\n${d.email}`;
-    location.href = `mailto:hammad18495@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    toast('Opening your email app…');
+    const btn = $('button[type=submit]', form), label = btn.innerHTML;
+    btn.disabled = true; btn.innerHTML = 'Sending…';
+    try {
+      const r = await fetch('https://formsubmit.co/ajax/hammad18495@gmail.com', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ name: d.name, email: d.email, company: d.company || '-', topic: d.topic, message: d.message,
+          _subject: subject, _replyto: d.email, _template: 'table', _captcha: 'false' })
+      });
+      const res = await r.json().catch(() => ({}));
+      if (!r.ok || String(res.success) === 'false') throw new Error(res.message || 'send failed');
+      form.reset();
+      $('#form-success').hidden = false; form.hidden = true;
+      toast('Message sent. Thank you!');
+    } catch (err) {
+      const body = `${d.message}\n\n— ${d.name}${d.company ? ', ' + d.company : ''}\n${d.email}`;
+      toast('Couldn\'t send directly, opening your email app…');
+      location.href = `mailto:hammad18495@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    } finally { btn.disabled = false; btn.innerHTML = label; }
   });
+  $('#send-another')?.addEventListener('click', () => { $('#form-success').hidden = true; form.hidden = false; });
   $$('#contact-form input, #contact-form textarea').forEach(i => i.addEventListener('input', () => i.closest('.field')?.classList.remove('invalid')));
 
   /* year */

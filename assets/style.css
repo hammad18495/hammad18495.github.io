@@ -382,3 +382,4 @@ body.leaving main{opacity:0;transition:opacity .22s}
   .reveal,.hero .anim{opacity:1;transform:none}
   .marquee-track{animation:none}
 }
+[hidden]{display:none!important}
