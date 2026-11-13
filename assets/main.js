@@ -15,6 +15,32 @@
     store.set('theme', next);
   });
 
+  /* career track: developer ⇄ support (set before paint in <head>) */
+  const trackBtns = $$('[data-set-track]');
+  const curTrack = () => (root.dataset.track === 'support' ? 'support' : 'dev');
+  const syncTrack = () => trackBtns.forEach(b => {
+    const on = b.dataset.setTrack === curTrack();
+    b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1;
+  });
+  const setTrack = (t, focus) => {
+    if (t === curTrack()) return;
+    root.dataset.track = t; store.set('track', t); syncTrack();
+    const u = new URL(location.href);
+    if (u.searchParams.has('track')) { u.searchParams.set('track', t); history.replaceState(null, '', u); }
+    if (focus) $(`[data-set-track="${t}"]`)?.focus();
+    document.dispatchEvent(new CustomEvent('trackchange', { detail: t }));
+    toast(t === 'support' ? 'Showing my customer support career' : 'Showing my developer career');
+  };
+  syncTrack();
+  trackBtns.forEach(b => {
+    b.addEventListener('click', () => setTrack(b.dataset.setTrack));
+    b.addEventListener('keydown', e => {
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+        e.preventDefault(); setTrack(curTrack() === 'dev' ? 'support' : 'dev', true);
+      }
+    });
+  });
+
   /* nav: scrolled state, progress, mobile menu */
   const nav = $('.nav'), bar = $('.progress'), top = $('.to-top');
   const onScroll = () => {
@@ -76,12 +102,15 @@
   /* typed roles */
   const typed = $('.typed');
   if (typed) {
-    const words = JSON.parse(typed.dataset.words);
-    if (reduce) typed.textContent = words[0];
-    else {
+    const getWords = () => JSON.parse(curTrack() === 'support' && typed.dataset.wordsSupport ? typed.dataset.wordsSupport : typed.dataset.words);
+    if (reduce) {
+      typed.textContent = getWords()[0];
+      document.addEventListener('trackchange', () => (typed.textContent = getWords()[0]));
+    } else {
       let w = 0, i = 0, del = false;
+      document.addEventListener('trackchange', () => { w = 0; i = 0; del = false; });
       const loop = () => {
-        const word = words[w];
+        const words = getWords(), word = words[w % words.length];
         typed.textContent = word.slice(0, i);
         if (!del && i < word.length) { i++; setTimeout(loop, 65); }
         else if (!del) { del = true; setTimeout(loop, 1700); }
@@ -153,6 +182,11 @@
       if (show) { p.classList.remove('in'); requestAnimationFrame(() => requestAnimationFrame(() => p.classList.add('in'))); }
     });
   }));
+
+  document.addEventListener('trackchange', () => {
+    filters.forEach(x => { const a = x.dataset.filter === 'all'; x.classList.toggle('active', a); x.setAttribute('aria-pressed', String(a)); });
+    $$('.proj').forEach(p => p.classList.remove('hide'));
+  });
 
   /* project modal */
   const modal = $('#modal');
